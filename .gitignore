@@ -1,0 +1,6 @@
+__pycache__/
+.vscode/
+h2res_format_data/
+scripts_generated_data/
+.DS_Store
+*.pyc
