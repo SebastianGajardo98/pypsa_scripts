@@ -21,7 +21,8 @@ def run(input_path: Path, output_path: Path) -> None:
             if not row or len(row) < 2:
                 continue
             timestamp_raw, *values = row
-            dt = datetime.strptime(timestamp_raw, "%m/%d/%Y %H:%M")
+            # Timestamps come as YYYY-MM-DD HH:MM:SS (e.g. 2020-01-01 00:00:00)
+            dt = datetime.strptime(timestamp_raw, "%Y-%m-%d %H:%M:%S")
 
             period_el = ET.SubElement(
                 root, "period", attrib={"timestamp": dt.strftime("%Y-%m-%d %H:%M:%S")}
@@ -66,4 +67,3 @@ if __name__ == "__main__":
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     run(args.input, args.output)
-

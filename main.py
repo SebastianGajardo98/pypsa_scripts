@@ -28,7 +28,9 @@ from convert_scaled_inflows import run as convert_scaled_inflows  # noqa: E402
 
 def main() -> None:
     data_dir = PROJECT_ROOT / "data"
-    out_dir = PROJECT_ROOT / "h2res_format_data"
+    # Allow overriding the export folder via env; default to a top-level path (e.g. for Colab)
+    export_folder = os.environ.get("H2RES_EXPORT_FOLDER", "/content/h2res_export_folder")
+    out_dir = Path(export_folder)
     out_dir.mkdir(exist_ok=True)
 
     # Read data from Drive (parametrizado por CLUSTERS_SUFFIX)
