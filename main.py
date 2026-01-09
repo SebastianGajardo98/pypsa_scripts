@@ -48,12 +48,12 @@ def main() -> None:
         output_path=out_dir / "heat_demand_2020_2050.xml",
     )
     convert_ncre_aval_factor(
-        offwind_ac=data_dir / f"profile_{CLUSTERS_SUFFIX}_offwind-ac.nc",
-        offwind_dc=data_dir / f"profile_{CLUSTERS_SUFFIX}_offwind-dc.nc",
-        offwind_float=data_dir / f"profile_{CLUSTERS_SUFFIX}_offwind-float.nc",
-        onwind=data_dir / f"profile_{CLUSTERS_SUFFIX}_onwind.nc",
-        solar=data_dir / f"profile_{CLUSTERS_SUFFIX}_solar.nc",
-        solar_hsat=data_dir / f"profile_{CLUSTERS_SUFFIX}_solar-hsat.nc",
+        offwind_ac=DRIVE_PREFIX / f"profile_{CLUSTERS_SUFFIX}_offwind-ac.nc",
+        offwind_dc=DRIVE_PREFIX / f"profile_{CLUSTERS_SUFFIX}_offwind-dc.nc",
+        offwind_float=DRIVE_PREFIX / f"profile_{CLUSTERS_SUFFIX}_offwind-float.nc",
+        onwind=DRIVE_PREFIX / f"profile_{CLUSTERS_SUFFIX}_onwind.nc",
+        solar=DRIVE_PREFIX / f"profile_{CLUSTERS_SUFFIX}_solar.nc",
+        solar_hsat=DRIVE_PREFIX / f"profile_{CLUSTERS_SUFFIX}_solar-hsat.nc",
         output_path=out_dir / "ncre_aval_factor_2020_2050.xml",
     )
     convert_scaled_inflows(
