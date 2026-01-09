@@ -41,9 +41,14 @@ def run(input_path: Path, output_path: Path) -> None:
     root = ET.Element("data")
     for idx, ts in enumerate(times):
         row_el = ET.SubElement(root, "row")
-        ts_str = np.datetime_as_string(ts, unit="s")
-        snapshot_el = ET.SubElement(row_el, "snapshot")
-        snapshot_el.text = ts_str.replace("T", " ")
+        dt = np.datetime64(ts).astype("datetime64[s]").astype(object)
+        year = dt.year
+        day_of_year = dt.timetuple().tm_yday
+        hour = dt.hour
+        period_number = (day_of_year - 1) * 24 + hour + 1
+
+        ET.SubElement(row_el, "year").text = str(year)
+        ET.SubElement(row_el, "period").text = str(period_number)
 
         demand_el = ET.SubElement(row_el, "general_demand")
         for node, value in zip(nodes, summed[idx]):
@@ -63,4 +68,3 @@ if __name__ == "__main__":
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     run(args.input, args.output)
-

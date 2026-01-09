@@ -17,44 +17,40 @@ def run(input_path: Path, output_path: Path) -> None:
         country_codes = header[1:]
 
         root = ET.Element("root")
+        last_dt = None
+        last_values = None
+        row_count = 0
         for row in reader:
             if not row or len(row) < 2:
                 continue
             timestamp_raw, *values = row
             # Timestamps come as YYYY-MM-DD HH:MM:SS (e.g. 2020-01-01 00:00:00)
             dt = datetime.strptime(timestamp_raw, "%Y-%m-%d %H:%M:%S")
-
-            period_el = ET.SubElement(
-                root, "period", attrib={"timestamp": dt.strftime("%Y-%m-%d %H:%M:%S")}
-            )
-
+            period_number = (dt.timetuple().tm_yday - 1) * 24 + dt.hour + 1
+            row_el = ET.SubElement(root, "row")
+            ET.SubElement(row_el, "year").text = str(dt.year)
+            ET.SubElement(row_el, "period").text = str(period_number)
             for code, value in zip(country_codes, values):
-                cell = ET.SubElement(period_el, code)
+                cell = ET.SubElement(row_el, code)
                 cell.text = value
+            last_dt = dt
+            last_values = values
+            row_count += 1
 
     # Pad last day if incomplete
-    periods = list(root.findall("period"))
-    if periods:
-        total_periods = len(periods)
-        remainder = total_periods % 24
+    if row_count and last_dt and last_values is not None:
+        remainder = row_count % 24
         if remainder != 0:
             missing = 24 - remainder
-            last_period = periods[-1]
-            last_timestamp = last_period.get("timestamp", "")
-            last_data = {child.tag: child.text for child in last_period}
-            
-            # Parse last timestamp to increment
-            if last_timestamp:
-                try:
-                    last_dt = datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
-                    for i in range(missing):
-                        new_dt = last_dt + timedelta(hours=i+1)
-                        new_period = ET.SubElement(root, "period", attrib={"timestamp": new_dt.strftime("%Y-%m-%d %H:%M:%S")})
-                        for tag, text in last_data.items():
-                            cell = ET.SubElement(new_period, tag)
-                            cell.text = text
-                except ValueError:
-                    pass  # Skip padding if timestamp parsing fails
+            for i in range(missing):
+                new_dt = last_dt + timedelta(hours=i + 1)
+                period_number = (new_dt.timetuple().tm_yday - 1) * 24 + new_dt.hour + 1
+                row_el = ET.SubElement(root, "row")
+                ET.SubElement(row_el, "year").text = str(new_dt.year)
+                ET.SubElement(row_el, "period").text = str(period_number)
+                for code, value in zip(country_codes, last_values):
+                    cell = ET.SubElement(row_el, code)
+                    cell.text = value
 
     ET.indent(root, space="  ")
     output_path.parent.mkdir(parents=True, exist_ok=True)
